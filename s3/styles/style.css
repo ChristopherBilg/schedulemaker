@@ -115,11 +115,15 @@ html {
 }
 
 .day-picker {
-    padding: 3px 11px
+    padding: 3px 11px;
+}
+
+.campus-picker {
+    padding: 3px 11px;
 }
 
 .reduce-padding {
-    padding: 5px 10px
+    padding: 5px 10px;
 }
 
 .list-group-horizontal {

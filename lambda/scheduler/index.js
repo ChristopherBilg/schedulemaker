@@ -8,18 +8,20 @@ exports.handler = async (event, context) => {
     let DBToScheduler = cache.DBToScheduler;
     let SchedulerToUI = cache.SchedulerToUI;
     let scheduler = cache.Scheduler;
-
+    
     let params = JSON.parse(event.body);
     let courseList = params.courses;
+    let campusList = (Array.isArray(params.campus)) ? params.campus : [params.campus];
     console.log(`Received the following courses: ${courseList}`);
-
+    console.log(`Received the following campuses: ${campusList}`);
     try {
-        var data = await getSections(courseList, params.campus);
+        var data = await getSections(courseList, campusList);
     } catch (error) {
         console.log(`'Unable to get all courses from database: ${error}`);
         return {
             statusCode: '500',
             body: "Unable to process request",
+            error: error,
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Methods': '*',
@@ -32,6 +34,7 @@ exports.handler = async (event, context) => {
     let schedules = scheduler.createSchedules(courses);
     let results = SchedulerToUI(schedules);
     console.log(`Created ${results.length} schedules`);
+    results = results.slice(0, process.env.MAX_SCHEDULES);
     
     return {
         statusCode: '200',

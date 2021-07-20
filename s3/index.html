@@ -125,6 +125,16 @@
                         &nbsp;
                     </div>
                     <br>
+                    <hr>
+                    <h4>Campus:</h4> 
+                    <ul class="list-group list-group-horizontal d-flex justify-content-center" id="campus-select">
+                        <li class="list-group-item campus-picker active" id="MN">Main</li>
+                        <li class="list-group-item campus-picker" id="AMB">Ambler</li>
+                        <li class="list-group-item campus-picker" id="CC">Center City</li>
+                        <li class="list-group-item campus-picker" id="JPN">Japan</li>
+                        <li class="list-group-item campus-picker" id="ROM">Rome</li>
+                    </ul>
+                    <hr>
                     <button id="create-schedules-button" type="button" class="btn btn-cherry">Create Schedules</button>
                 </form>
 
@@ -185,6 +195,16 @@
                     var courseChips = response;
 
                     $('#create-schedules-button').on('click', function() {
+                        let campuses = [];
+                        for (let currentCampus of $('.campus-picker')) {
+                            if (currentCampus.classList.contains('active')) {
+                                campuses.push(currentCampus.id);
+                            }
+                        }
+                        if(campuses.length === 0) {
+                            campuses = ['MN'];
+                        }
+
                         let courses = courseChips.getSelected();
                         if(courses.length === 0) {
                             $('#course-chips').html("You must add at least one course to create a schedule.");
@@ -192,13 +212,15 @@
                             $.when(
                                 postClassTimes(
                                     {
-                                        courses: courses
+                                        courses: courses,
+                                        campus: campuses
                                     }
                                 )
                             ).then(function(response) {
                                 sessionStorage.setItem('schedules', JSON.stringify(response));
                                 sessionStorage.setItem('schedulesFilteredByDay', JSON.stringify(response));
                                 sessionStorage.setItem('schedulesFilteredByTime', JSON.stringify(response));
+                                sessionStorage.setItem('campuses', JSON.stringify(campuses));
 
                                 //Reset filters
                                 $(".dropdown-menu a").removeClass("active");
@@ -226,17 +248,20 @@
                     $('#select-classes-button').show();
                     $('#filter-options').show();
                     $('#form-div').show();
+                    let campuses = JSON.parse(sessionStorage.getItem('campuses'));
+                        for (let currentCampus of $('.campus-picker')) {
+                            if (campuses.includes(currentCampus.id)) {
+                                currentCampus.classList.add('active');
+                            }
+                        }
                 })
 
-                $(".list-group li").on("click", function() {
-                    if ($(this).hasClass("active")) {
-                        $(this).removeClass("active");
-                        filterByDay();
+                $("#days-of-week").on("click", function() {
+                    filterByDay();   
+                });
 
-                    } else {
-                        $(this).addClass("active");
-                        filterByDay();   
-                    }
+                $(".list-group li").on("click", function() {
+                    $(this).toggleClass('active');
                 });
 
                 $('#startDropdown a').on("click", function() {
@@ -269,6 +294,11 @@
 
             function addSchedules(schedules) {
                 $('#schedule-list').html('<ul class="list-group force-overflow"></ul>');
+
+                if(schedules.length === 0) {
+                    $('#schedule-list ul').append('<li class="list-group-item reduce-padding">No schedules found for the courses selected.</li>');
+                    return;
+                }
                 
                 for(let i = 0; i < schedules.length; i++) {
                     $('#schedule-list ul').append(

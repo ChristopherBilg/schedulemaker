@@ -1,4 +1,7 @@
 # ScheduleMaker ReadME
+[Click here for the link to the app (v1)](http://schedule-maker.s3-website.us-east-2.amazonaws.com/)
+# This repo will be archived and view-only. Future development will take place in the new dedicated repos for each functionality.
+
 [Click here for the Updated Project Proposal](https://github.com/3296f19temple/schedulemaker/blob/master/Proposal.md)
 
 ## Project Documentation Overview
